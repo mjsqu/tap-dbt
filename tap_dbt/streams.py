@@ -9,7 +9,7 @@ from typing import cast
 import pendulum
 from singer_sdk.pagination import BaseOffsetPaginator
 
-from tap_dbt.client import DBTStream
+from tap_dbt.client import DBTStream, DBTDiscoveryStream
 
 if t.TYPE_CHECKING:
     import requests
@@ -165,6 +165,7 @@ class AccountsStream(DBTStream):
     path = "/accounts"
     schema_filepath = SCHEMAS_DIR / "accounts.json"
     openapi_ref = "Account"
+    selected_by_default = False
 
 
 class ConnectionsStream(AccountBasedStream):
@@ -191,6 +192,7 @@ class JobsStream(AccountBasedStream):
     name = "jobs"
     path = "/accounts/{account_id}/jobs"
     openapi_ref = "Job"
+    selected_by_default = False
 
 
 class ProjectsStream(AccountBasedStream):
@@ -199,7 +201,7 @@ class ProjectsStream(AccountBasedStream):
     name = "projects"
     path = "/accounts/{account_id}/projects"
     openapi_ref = "Project"
-
+    selected_by_default = False
 
 class RepositoriesStream(AccountBasedStream):
     """A stream for the repositories endpoint."""
@@ -217,6 +219,7 @@ class RunsStream(AccountBasedIncrementalStream):
     path = "/accounts/{account_id}/runs"
     openapi_ref = "Run"
     replication_key = "finished_at"
+    selected_by_default = False
 
 
 class UsersStream(AccountBasedStream):
@@ -226,3 +229,16 @@ class UsersStream(AccountBasedStream):
     path = "/accounts/{account_id}/users"
     openapi_ref = "User"
     selected_by_default = False
+
+
+class ExperimentalStream(DBTDiscoveryStream):
+    name = "experimental"
+    selected_by_default = True
+    openapi_ref = "Job"
+    query = """query ExampleQuery($jobId: BigInt!=319) {
+  job(id: $jobId) {
+    id
+    runId
+  }
+}
+"""

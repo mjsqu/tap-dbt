@@ -8,7 +8,7 @@ from functools import lru_cache
 
 import requests
 import yaml
-from singer_sdk import RESTStream
+from singer_sdk import RESTStream, GraphQLStream
 from singer_sdk._singerlib import resolve_schema_references
 from singer_sdk.authenticators import APIAuthenticatorBase, SimpleAuthenticator
 
@@ -38,7 +38,7 @@ class DBTStream(RESTStream):
     @property
     def url_base(self) -> str:
         """Base URL for this stream."""
-        return self.config.get("base_url", "https://cloud.getdbt.com/api/v2")
+        return f"""{self.config.get("base_url", "https://cloud.getdbt.com/api/v2")}/api/v2"""
 
     @property
     def http_headers(self) -> dict:
@@ -91,3 +91,13 @@ class DBTStream(RESTStream):
             The OpenAPI reference for this stream.
         """
         ...
+
+
+class DBTDiscoveryStream(GraphQLStream, DBTStream):
+    @property
+    def url_base(self) -> str:
+        """Base URL for this stream."""
+        base_url = self.config.get("base_url", "https://cloud.getdbt.com")
+        graphql_url = f"""{base_url.replace("https://","https://metadata.")}/graphql"""
+        return graphql_url
+  

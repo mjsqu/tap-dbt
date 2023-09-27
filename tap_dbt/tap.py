@@ -21,6 +21,7 @@ from tap_dbt.streams import (
     RepositoriesStream,
     RunsStream,
     UsersStream,
+    ExperimentalStream,
 )
 
 TAP_NAME = "tap-dbt"
@@ -33,6 +34,7 @@ STREAM_TYPES = [
     RepositoriesStream,
     RunsStream,
     UsersStream,
+    ExperimentalStream,
 ]
 
 
@@ -59,13 +61,13 @@ class TapDBT(Tap):
                 "account_ids",
                 ArrayType(StringType),
                 description="dbt Cloud account IDs",
-                required=True,
+                #required=True,
             ),
             Property(
                 "base_url",
                 StringType,
                 description="Base URL for the dbt Cloud API",
-                default="https://cloud.getdbt.com/api/v2",
+                default="https://cloud.getdbt.com",
             ),
             Property(
                 "user_agent",
